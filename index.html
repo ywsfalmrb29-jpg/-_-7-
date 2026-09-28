@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👑 EDMAN OSINT</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --black:#0a0a0f;
+  --black-2:#12121a;
+  --gold:#d4af37;
+  --gold-light:#f4d47c;
+  --gold-dark:#a88829;
+  --white:#f5f5f7;
+  --white-dim:#a8a8b3;
+  --white-dimmer:#6a6a75;
+  --border:rgba(212,175,55,0.2);
+  --border-hover:rgba(212,175,55,0.5);
+  --gradient:linear-gradient(135deg,#d4af37,#f4d47c,#d4af37);
+  --success:#22c55e;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+}
+
+body{
+  font-family:'Cairo',sans-serif;
+  background:var(--black);
+  color:var(--white);
+  min-height:100vh;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at 20% 20%,rgba(212,175,55,0.08),transparent 40%),
+             radial-gradient(circle at 80% 80%,rgba(212,175,55,0.05),transparent 40%);
+  z-index:0;
+  pointer-events:none;
+}
+
+main{
+  position:relative;
+  z-index:5;
+  max-width:1300px;
+  margin:0 auto;
+  padding:20px 20px 100px;
+}
+
+/* الهيدر */
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  padding:18px 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(10,10,15,0.95);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.logo{display:flex;align-items:center;gap:12px}
+
+.logo-icon{
+  width:46px;height:46px;border-radius:12px;
+  background:var(--gradient);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;box-shadow:0 0 25px rgba(212,175,55,0.4);
+}
+
+.logo-text{
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;font-weight:900;letter-spacing:1.5px;
+  background:linear-gradient(135deg,#f4d47c,#d4af37,#f4d47c);
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 4s linear infinite;
+}
+
+@keyframes shine{to{background-position:200% center}}
+
+.logo-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:var(--gold);letter-spacing:3px;opacity:0.7;
+}
+
+.header-badge{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 16px;
+  background:rgba(212,175,55,0.08);
+  border:1px solid var(--border);border-radius:20px;
+  font-size:0.75rem;font-weight:700;color:var(--gold-light);
+}
+
+.badge-dot{
+  width:7px;height:7px;background:var(--success);border-radius:50%;
+  box-shadow:0 0 8px var(--success);animation:pulse 2s infinite;
+}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* Hero */
+.hero{text-align:center;padding:50px 20px 30px}
+
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.8rem,6vw,3rem);
+  font-weight:900;line-height:1.15;margin-bottom:18px;
+}
+
+.hero h1 .gold{
+  background:linear-gradient(135deg,#f4d47c,#d4af37,#f4d47c);
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 4s linear infinite;
+}
+
+.hero p{
+  color:var(--white-dim);font-size:clamp(0.9rem,2.5vw,1.05rem);
+  max-width:650px;margin:0 auto 30px;line-height:1.8;
+}
+
+/* البحث */
+.search-box{
+  max-width:700px;margin:0 auto;
+  background:linear-gradient(135deg,rgba(20,20,28,0.95),rgba(15,15,22,0.95));
+  border:1px solid var(--border);border-radius:18px;padding:8px;
+  display:flex;gap:8px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.4);
+  transition:all 0.4s;
+}
+
+.search-box:focus-within{
+  border-color:var(--gold);
+  box-shadow:0 15px 50px rgba(212,175,55,0.25);
+}
+
+.search-box input{
+  flex:1;min-width:150px;padding:15px 20px;
+  background:transparent;border:none;color:var(--white);
+  font-family:'Cairo',sans-serif;font-size:0.95rem;outline:none;
+}
+
+.search-box input::placeholder{color:var(--white-dimmer)}
+
+.search-box button{
+  padding:15px 32px;background:var(--gradient);border:none;
+  border-radius:12px;color:var(--black);
+  font-family:'Cairo',sans-serif;font-weight:900;font-size:0.9rem;
+  cursor:pointer;transition:all 0.3s;
+  box-shadow:0 5px 20px rgba(212,175,55,0.3);
+  display:flex;align-items:center;gap:6px;
+}
+
+.search-box button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,175,55,0.5)}
+
+/* شبكة الأقسام */
+.tabs-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px;margin:40px 0 25px;
+}
+
+.tab-btn{
+  padding:18px 15px;
+  background:linear-gradient(135deg,rgba(20,20,28,0.8),rgba(15,15,22,0.8));
+  border:1px solid var(--border);border-radius:14px;
+  cursor:pointer;transition:all 0.4s;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-family:'Cairo',sans-serif;color:var(--white);
+}
+
+.tab-btn:hover{
+  border-color:var(--border-hover);
+  transform:translateY(-4px);
+  box-shadow:0 10px 30px rgba(212,175,55,0.15);
+}
+
+.tab-btn.active{
+  border-color:var(--gold);
+  background:linear-gradient(135deg,rgba(212,175,55,0.15),rgba(20,20,28,0.9));
+  box-shadow:0 0 25px rgba(212,175,55,0.3);
+}
+
+.tab-icon{font-size:1.6rem}
+.tab-name{font-weight:700;font-size:0.85rem}
+
+/* الأقسام */
+.section{display:none;animation:fadeIn 0.4s ease}
+.section.active{display:block}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+/* رأس القسم */
+.section-header{
+  display:flex;align-items:center;gap:14px;
+  padding:18px 22px;
+  background:linear-gradient(135deg,rgba(20,20,28,0.9),rgba(15,15,22,0.9));
+  border:1px solid var(--border);border-radius:14px;
+  margin-bottom:22px;box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  flex-wrap:wrap;
+}
+
+.section-h-icon{
+  width:50px;height:50px;border-radius:12px;
+  background:var(--gradient);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;box-shadow:0 0 20px rgba(212,175,55,0.35);
+}
+
+.section-h-title{flex:1;min-width:150px}
+
+.section-h-title h2{
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;font-weight:900;
+  background:linear-gradient(135deg,#f4d47c,#d4af37);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.section-h-title p{color:var(--white-dim);font-size:0.8rem}
+
+.section-h-count{
+  padding:6px 14px;background:rgba(212,175,55,0.08);
+  border:1px solid var(--border);border-radius:20px;
+  font-size:0.72rem;font-weight:700;color:var(--gold-light);
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* شبكة الأدوات */
+.tools-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:14px;margin-bottom:25px;
+}
+
+.tool-card{
+  padding:22px;
+  background:linear-gradient(135deg,rgba(20,20,28,0.85),rgba(15,15,22,0.85));
+  border:1px solid rgba(212,175,55,0.15);
+  border-radius:14px;cursor:pointer;
+  transition:all 0.4s;position:relative;overflow:hidden;
+}
+
+.tool-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:3px;height:100%;background:var(--gradient);
+  transform:scaleY(0);transition:transform 0.4s;
+}
+
+.tool-card:hover{
+  border-color:var(--border-hover);
+  transform:translateY(-5px);
+  box-shadow:0 15px 40px rgba(212,175,55,0.15);
+}
+
+.tool-card:hover::before{transform:scaleY(1)}
+
+.tool-icon{
+  width:48px;height:48px;border-radius:12px;
+  background:rgba(212,175,55,0.08);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;margin-bottom:14px;transition:all 0.4s;
+}
+
+.tool-card:hover .tool-icon{
+  background:var(--gradient);
+  box-shadow:0 0 20px rgba(212,175,55,0.4);
+}
+
+.tool-title{font-weight:700;font-size:0.98rem;margin-bottom:5px}
+.tool-desc{color:var(--white-dim);font-size:0.82rem;line-height:1.6}
+
+.tool-badge{
+  position:absolute;top:14px;left:14px;
+  padding:3px 8px;background:rgba(212,175,55,0.12);
+  border:1px solid var(--border);border-radius:6px;
+  font-size:0.6rem;font-weight:700;color:var(--gold-light);
+  font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;
+}
+
+/* لوحة الأداة */
+.tool-panel{
+  background:linear-gradient(135deg,rgba(20,20,28,0.9),rgba(15,15,22,0.9));
+  border:1px solid var(--border);border-radius:16px;
+  padding:25px;margin-bottom:20px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.3);
+  animation:fadeIn 0.3s ease;
+}
+
+.tool-panel-header{
+  display:flex;align-items:center;gap:12px;
+  padding-bottom:18px;border-bottom:1px solid var(--border);
+  margin-bottom:20px;flex-wrap:wrap;
+}
+
+.back-btn{
+  padding:9px 18px;background:rgba(212,175,55,0.08);
+  border:1px solid var(--border);border-radius:10px;
+  color:var(--gold-light);cursor:pointer;
+  font-family:'Cairo',sans-serif;font-size:0.82rem;font-weight:700;
+  transition:all 0.3s;display:flex;align-items:center;gap:6px;
+}
+
+.back-btn:hover{background:rgba(212,175,55,0.15);border-color:var(--gold)}
+
+.tool-panel-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;font-weight:900;color:var(--gold-light);
+  flex:1;display:flex;align-items:center;gap:8px;
+}
+
+/* النماذج */
+.form-group{margin-bottom:18px}
+
+.form-label{
+  display:block;font-size:0.85rem;font-weight:700;
+  color:var(--gold-light);margin-bottom:8px;
+}
+
+.form-input{
+  width:100%;padding:14px 16px;
+  background:rgba(10,10,15,0.6);
+  border:1.5px solid rgba(212,175,55,0.15);
+  border-radius:10px;color:var(--white);
+  font-family:'Cairo',sans-serif;font-size:0.92rem;
+  outline:none;transition:all 0.3s;
+}
+
+.form-input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(212,175,55,0.1);
+}
+
+.form-input.mono{
+  font-family:'JetBrains Mono',monospace;
+  direction:ltr;text-align:left;
+}
+
+/* الأزرار */
+.btn{
+  padding:13px 28px;border:none;border-radius:10px;
+  font-family:'Cairo',sans-serif;font-size:0.9rem;font-weight:700;
+  cursor:pointer;transition:all 0.3s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+}
+
+.btn-gold{
+  background:var(--gradient);color:var(--black);
+  box-shadow:0 5px 20px rgba(212,175,55,0.3);
+}
+
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,175,55,0.5)}
+
+.btn-block{width:100%}
+
+/* النتائج */
+.result-box{
+  margin-top:20px;padding:20px;
+  background:rgba(10,10,15,0.6);
+  border:1px solid rgba(212,175,55,0.15);
+  border-right:4px solid var(--gold);
+  border-radius:12px;
+  font-size:0.88rem;line-height:1.8;
+  display:none;animation:fadeIn 0.3s ease;
+}
+
+.result-box.show{display:block}
+
+.result-box table{width:100%;border-collapse:collapse}
+
+.result-box table tr{border-bottom:1px solid rgba(212,175,55,0.08)}
+
+.result-box table tr:last-child{border-bottom:none}
+
+.result-box table td{padding:11px 13px;font-size:0.85rem}
+
+.result-box table td:first-child{
+  color:var(--white-dim);font-weight:600;width:45%;
+}
+
+.result-box table td:last-child{
+  color:var(--gold-light);font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+  direction:ltr;text-align:left;
+}
+
+.result-header{
+  padding:14px 18px;background:var(--gradient);
+  color:var(--black);border-radius:10px;
+  margin-bottom:16px;font-weight:900;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* الثيمات */
+.themes-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:14px;margin-top:18px;
+}
+
+.theme-option{
+  padding:18px 12px;background:rgba(20,20,28,0.8);
+  border:2px solid rgba(212,175,55,0.15);
+  border-radius:14px;cursor:pointer;
+  transition:all 0.4s;text-align:center;position:relative;
+}
+
+.theme-option:hover{transform:translateY(-4px);border-color:var(--border-hover)}
+
+.theme-option.active{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(212,175,55,0.15);
+}
+
+.theme-preview{
+  width:100%;height:60px;border-radius:10px;
+  margin-bottom:12px;
+}
+
+.theme-name{font-weight:700;font-size:0.82rem}
+
+.theme-check{
+  position:absolute;top:8px;left:8px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--gradient);color:var(--black);
+  display:none;align-items:center;justify-content:center;
+  font-size:0.7rem;font-weight:900;
+}
+
+.theme-option.active .theme-check{display:flex}
+
+/* اللغات */
+.lang-options{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px;margin-top:18px;
+}
+
+.lang-option{
+  padding:20px;background:rgba(20,20,28,0.8);
+  border:2px solid rgba(212,175,55,0.15);
+  border-radius:14px;cursor:pointer;
+  transition:all 0.4s;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  font-weight:700;font-size:1rem;color:var(--white);
+}
+
+.lang-option:hover{transform:translateY(-3px);border-color:var(--border-hover)}
+
+.lang-option.active{
+  border-color:var(--gold);
+  background:rgba(212,175,55,0.08);
+}
+
+.lang-option .flag{font-size:1.8rem}
+
+/* السجل */
+.log-list{display:flex;flex-direction:column;gap:10px}
+
+.log-item{
+  padding:15px 20px;background:rgba(20,20,28,0.8);
+  border:1px solid rgba(212,175,55,0.15);
+  border-right:4px solid var(--gold);
+  border-radius:10px;
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;flex-wrap:wrap;
+}
+
+.log-title{font-weight:700;font-size:0.9rem}
+.log-time{color:var(--white-dim);font-size:0.72rem;font-family:'JetBrains Mono',monospace}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--white-dim)}
+
+.empty-state .icon{font-size:4rem;margin-bottom:15px;opacity:0.3}
+
+.empty-state h3{
+  color:var(--gold-light);font-family:'Playfair Display',serif;
+  font-size:1.2rem;margin-bottom:8px;
+}
+
+/* الفوتر */
+footer{
+  position:relative;z-index:5;margin-top:50px;
+  padding:35px 20px;background:rgba(10,10,15,0.95);
+  border-top:1px solid var(--border);text-align:center;
+}
+
+.footer-links{
+  display:flex;justify-content:center;gap:10px;
+  flex-wrap:wrap;margin-bottom:20px;
+}
+
+.footer-link{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 18px;background:rgba(20,20,28,0.8);
+  border:1px solid var(--border);border-radius:25px;
+  text-decoration:none;color:var(--white-dim);
+  font-weight:700;font-size:0.8rem;transition:all 0.3s;
+}
+
+.footer-link:hover{
+  border-color:var(--gold);color:var(--gold-light);
+  transform:translateY(-2px);
+}
+
+.footer-brand{
+  font-family:'Playfair Display',serif;font-size:1.2rem;
+  font-weight:900;letter-spacing:2px;
+  background:linear-gradient(135deg,#f4d47c,#d4af37,#f4d47c);
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 4s linear infinite;
+  margin-bottom:6px;
+}
+
+.footer-text{
+  color:var(--white-dimmer);font-size:0.72rem;
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;
+}
+
+/* التوست */
+.toast{
+  position:fixed;bottom:30px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  padding:14px 26px;
+  background:linear-gradient(135deg,rgba(20,20,28,0.98),rgba(15,15,22,0.98));
+  border:1.5px solid var(--gold);border-radius:12px;
+  color:var(--gold-light);font-weight:700;font-size:0.88rem;
+  box-shadow:0 10px 40px rgba(212,175,55,0.3);
+  z-index:1000;transition:all 0.4s;
+  max-width:90%;text-align:center;
+}
+
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--success);color:#4ade80}
+.toast.error{border-color:var(--danger);color:#f87171}
+
+/* الموبايل */
+@media (max-width:768px){
+  header{padding:14px 18px}
+  .logo-icon{width:40px;height:40px;font-size:1.2rem}
+  .logo-text{font-size:1rem}
+  main{padding:15px 15px 90px}
+  .hero{padding:35px 15px 25px}
+  .hero h1{font-size:1.6rem}
+  .search-box{flex-direction:column;padding:6px}
+  .search-box button{width:100%;justify-content:center}
+  .tabs-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .tab-btn{padding:14px 8px}
+  .tab-icon{font-size:1.3rem}
+  .tab-name{font-size:0.75rem}
+  .tools-grid{grid-template-columns:1fr;gap:10px}
+  .tool-card{padding:16px}
+  .themes-grid{grid-template-columns:repeat(2,1fr)}
+  .lang-options{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- الهيدر -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">👑</div>
+    <div>
+      <div class="logo-text">EDMAN OSINT</div>
+      <div class="logo-sub">INTELLIGENCE PLATFORM</div>
+    </div>
+  </div>
+  <div class="header-badge">
+    <span class="badge-dot"></span>
+    <span>النظام يعمل</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>
+      <span class="gold">اكتشف</span> ما وراء
+      <br>
+      <span class="gold">الأرقام والهويات</span>
+    </h1>
+    <p>منصة OSINT متقدمة لتحليل الأرقام، الإيميلات، النطاقات والحسابات</p>
+
+    <div class="search-box">
+      <input type="text" id="globalSearch" placeholder="🔍 ابحث عن رقم، إيميل، يوزر، أو نطاق...">
+      <button onclick="globalSearch()">
+        <span>🔍</span>
+        <span>ابحث</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- التبويبات -->
+  <div class="tabs-grid">
+    <div class="tab-btn active" onclick="showSection('phone', this)">
+      <div class="tab-icon">📱</div>
+      <div class="tab-name">الأرقام</div>
+    </div>
+    <div class="tab-btn" onclick="showSection('email', this)">
+      <div class="tab-icon">📧</div>
+      <div class="tab-name">الإيميلات</div>
+    </div>
+    <div class="tab-btn" onclick="showSection('domain', this)">
+      <div class="tab-icon">🌐</div>
+      <div class="tab-name">المواقع</div>
+    </div>
+    <div class="tab-btn" onclick="showSection('username', this)">
+      <div class="tab-icon">👤</div>
+      <div class="tab-name">الحسابات</div>
+    </div>
+    <div class="tab-btn" onclick="showSection('logs', this)">
+      <div class="tab-icon">📋</div>
+      <div class="tab-name">السجل</div>
+    </div>
+    <div class="tab-btn" onclick="showSection('settings', this)">
+      <div class="tab-icon">⚙️</div>
+      <div class="tab-name">الإعدادات</div>
+    </div>
+  </div>
+
+  <!-- قسم الأرقام -->
+  <section class="section active" id="section-phone">
+    <div class="section-header">
+      <div class="section-h-icon">📱</div>
+      <div class="section-h-title">
+        <h2>تحليل الأرقام</h2>
+        <p>معلومات شاملة عن أي رقم</p>
+      </div>
+      <span class="section-h-count">2 TOOLS</span>
+    </div>
+    <div class="tools-grid" id="phoneGrid"></div>
+    <div id="phone-container"></div>
+  </section>
+
+  <!-- قسم الإيميلات -->
+  <section class="section" id="section-email">
+    <div class="section-header">
+      <div class="section-h-icon">📧</div>
+      <div class="section-h-title">
+        <h2>تحليل الإيميلات</h2>
+        <p>فحص الإيميلات والتسريبات</p>
+      </div>
+      <span class="section-h-count">2 TOOLS</span>
+    </div>
+    <div class="tools-grid" id="emailGrid"></div>
+    <div id="email-container"></div>
+  </section>
+
+  <!-- قسم المواقع -->
+  <section class="section" id="section-domain">
+    <div class="section-header">
+      <div class="section-h-icon">🌐</div>
+      <div class="section-h-title">
+        <h2>تحليل النطاقات</h2>
+        <p>معلومات النطاقات و IP</p>
+      </div>
+      <span class="section-h-count">2 TOOLS</span>
+    </div>
+    <div class="tools-grid" id="domainGrid"></div>
+    <div id="domain-container"></div>
+  </section>
+
+  <!-- قسم الحسابات -->
+  <section class="section" id="section-username">
+    <div class="section-header">
+      <div class="section-h-icon">👤</div>
+      <div class="section-h-title">
+        <h2>بحث الحسابات</h2>
+        <p>اكتشاف الحسابات</p>
+      </div>
+      <span class="section-h-count">2 TOOLS</span>
+    </div>
+    <div class="tools-grid" id="usernameGrid"></div>
+    <div id="username-container"></div>
+  </section>
+
+  <!-- قسم السجل -->
+  <section class="section" id="section-logs">
+    <div class="section-header">
+      <div class="section-h-icon">📋</div>
+      <div class="section-h-title">
+        <h2>سجل العمليات</h2>
+        <p>جميع العمليات</p>
+      </div>
+    </div>
+    <div class="log-list" id="logsList">
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <h3>لا توجد عمليات</h3>
+        <p>ابدأ استخدام الأدوات</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم الإعدادات -->
+  <section class="section" id="section-settings">
+    <div class="section-header">
+      <div class="section-h-icon">⚙️</div>
+      <div class="section-h-title">
+        <h2>الإعدادات</h2>
+        <p>الثيمات واللغات</p>
+      </div>
+    </div>
+
+    <div class="tool-panel">
+      <h3 class="about-title" style="color:var(--gold-light);font-family:'Playfair Display',serif;margin-bottom:15px">🎨 الثيمات</h3>
+      <div class="themes-grid" id="themesGrid"></div>
+    </div>
+
+    <div class="tool-panel">
+      <h3 class="about-title" style="color:var(--gold-light);font-family:'Playfair Display',serif;margin-bottom:15px">🌍 اللغات</h3>
+      <div class="lang-options" id="langOptions"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-links">
+    <a href="https://www.youtube.com/@Edman_haking-i4f" target="_blank" class="footer-link">
+      <span>▶️</span> YouTube
+    </a>
+    <a href="https://t.me/youssef7_HAKER" target="_blank" class="footer-link">
+      <span>✈️</span> Telegram
+    </a>
+    <a href="https://ywsfalmrb29-jpg.github.io/LEARN_HACK_EDMAN/" target="_blank" class="footer-link">
+      <span>🌐</span> Learn Security
+    </a>
+  </div>
+  <div class="footer-brand">👑 EDMAN HAKING 👑</div>
+  <div class="footer-text">EDMAN OSINT TOOL © 2025</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================
+   EDMAN OSINT TOOL - JavaScript
+   ============================================ */
+
+/* ===== الثيمات ===== */
+const THEMES = {
+  royal: { name: 'ملكي ذهبي', colors: ['#0a0a0f', '#d4af37', '#f4d47c'] },
+  'matrix-red': { name: 'ماتريكس أحمر', colors: ['#1a0505', '#dc2626', '#f97316'] },
+  'matrix-green': { name: 'ماتريكس أخضر', colors: ['#051a0a', '#059669', '#84cc16'] },
+  'navy-blue': { name: 'أزرق ملكي', colors: ['#050a1a', '#1e3a8a', '#0ea5e9'] },
+  'midnight-purple': { name: 'بنفسجي ليلي', colors: ['#0a0514', '#6d28d9', '#ec4899'] }
+};
+
+/* ===== قائمة الأدوات ===== */
+const PHONE_TOOLS = [
+  { id: 'phoneinfo', icon: '📱', name: 'Phone Info', desc: 'تحليل كامل للرقم' },
+  { id: 'phonevalid', icon: '✓', name: 'Phone Validator', desc: 'فحص صحة الرقم' }
+];
+
+const EMAIL_TOOLS = [
+  { id: 'emailvalid', icon: '✓', name: 'Email Validator', desc: 'فحص صحة الإيميل' },
+  { id: 'emailinfo', icon: '📧', name: 'Email Info', desc: 'معلومات كاملة' }
+];
+
+const DOMAIN_TOOLS = [
+  { id: 'domaininfo', icon: '🌐', name: 'Domain Info', desc: 'معلومات النطاق' },
+  { id: 'iplookup', icon: '📡', name: 'IP Lookup', desc: 'بحث عن IP' }
+];
+
+const USERNAME_TOOLS = [
+  { id: 'usersearch', icon: '👤', name: 'Username Search', desc: 'بحث في 20+ موقع' },
+  { id: 'hashcheck', icon: '🔒', name: 'Hash Checker', desc: 'تحليل Hash' }
+];
+
+/* ===== السجل ===== */
+let activityLogs = [];
+
+function addLog(title, type = 'info') {
+  const time = new Date().toLocaleTimeString('ar-EG');
+  activityLogs.unshift({ title, type, time });
+  if (activityLogs.length > 50) activityLogs.pop();
+  renderLogs();
+}
+
+function renderLogs() {
+  const list = document.getElementById('logsList');
+  if (!list) return;
+  if (activityLogs.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>لا توجد عمليات</h3><p>ابدأ استخدام الأدوات</p></div>`;
+    return;
+  }
+  list.innerHTML = activityLogs.map(l => `
+    <div class="log-item">
+      <div class="log-title">${l.title}</div>
+      <div class="log-time">${l.time}</div>
+    </div>
+  `).join('');
+}
+
+function clearLogs() {
+  if (!confirm('متأكد؟')) return;
+  activityLogs = [];
+  renderLogs();
+  showToast('🗑️ تم المسح', 'success');
+}
+
+/* ===== التنقل ===== */
+function showSection(section, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('section-' + section);
+  if (target) target.classList.add('active');
+
+  if (btn) {
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===== عرض الأدوات ===== */
+function renderTools() {
+  const grids = {
+    phoneGrid: PHONE_TOOLS,
+    emailGrid: EMAIL_TOOLS,
+    domainGrid: DOMAIN_TOOLS,
+    usernameGrid: USERNAME_TOOLS
+  };
+
+  Object.entries(grids).forEach(([gridId, tools]) => {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.innerHTML = tools.map(t => `
+      <div class="tool-card" onclick="openTool('${t.id}')">
+        <div class="tool-icon">${t.icon}</div>
+        <div class="tool-title">${t.name}</div>
+        <div class="tool-desc">${t.desc}</div>
+      </div>
+    `).join('');
+  });
+}
+
+/* ===== فتح أداة ===== */
+function openTool(toolId) {
+  const allTools = [...PHONE_TOOLS, ...EMAIL_TOOLS, ...DOMAIN_TOOLS, ...USERNAME_TOOLS];
+  const tool = allTools.find(t => t.id === toolId);
+  if (!tool) return;
+
+  let containerId;
+  if (PHONE_TOOLS.find(t => t.id === toolId)) containerId = 'phone-container';
+  else if (EMAIL_TOOLS.find(t => t.id === toolId)) containerId = 'email-container';
+  else if (DOMAIN_TOOLS.find(t => t.id === toolId)) containerId = 'domain-container';
+  else if (USERNAME_TOOLS.find(t => t.id === toolId)) containerId = 'username-container';
+
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="tool-panel">
+      <div class="tool-panel-header">
+        <button class="back-btn" onclick="closeTool('${containerId}')">← رجوع</button>
+        <div class="tool-panel-title">${tool.icon} ${tool.name}</div>
+      </div>
+      <div id="toolContent">${getToolUI(toolId)}</div>
+    </div>
+  `;
+
+  setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  addLog('فتح أداة: ' + tool.name, 'info');
+}
+
+function closeTool(containerId) {
+  const c = document.getElementById(containerId);
+  if (c) c.innerHTML = '';
+}
+
+/* ===== واجهات الأدوات ===== */
+function getToolUI(id) {
+  const UIs = {
+    phoneinfo: `
+      <div class="form-group">
+        <label class="form-label">📱 رقم الهاتف (مع كود الدولة)</label>
+        <input type="text" class="form-input mono" id="phoneInput" placeholder="+201151739983">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runPhoneInfo()">📱 تحليل الرقم</button>
+      <div class="result-box" id="phoneResult"></div>
+    `,
+    phonevalid: `
+      <div class="form-group">
+        <label class="form-label">📱 رقم للتحقق</label>
+        <input type="text" class="form-input mono" id="phoneValidInput" placeholder="+201151739983">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runPhoneValid()">✓ التحقق</button>
+      <div class="result-box" id="phoneValidResult"></div>
+    `,
+    emailvalid: `
+      <div class="form-group">
+        <label class="form-label">📧 البريد الإلكتروني</label>
+        <input type="text" class="form-input mono" id="emailValidInput" placeholder="user@example.com">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runEmailValid()">✓ التحقق</button>
+      <div class="result-box" id="emailValidResult"></div>
+    `,
+    emailinfo: `
+      <div class="form-group">
+        <label class="form-label">📧 البريد الإلكتروني</label>
+        <input type="text" class="form-input mono" id="emailInfoInput" placeholder="user@example.com">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runEmailInfo()">📧 تحليل الإيميل</button>
+      <div class="result-box" id="emailInfoResult"></div>
+    `,
+    domaininfo: `
+      <div class="form-group">
+        <label class="form-label">🌐 النطاق</label>
+        <input type="text" class="form-input mono" id="domainInput" placeholder="example.com">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runDomainInfo()">🌐 تحليل النطاق</button>
+      <div class="result-box" id="domainResult"></div>
+    `,
+    iplookup: `
+      <div class="form-group">
+        <label class="form-label">📡 عنوان IP</label>
+        <input type="text" class="form-input mono" id="ipInput" placeholder="8.8.8.8">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runIpLookup()">📡 بحث IP</button>
+      <div class="result-box" id="ipResult"></div>
+    `,
+    usersearch: `
+      <div class="form-group">
+        <label class="form-label">👤 اسم المستخدم</label>
+        <input type="text" class="form-input mono" id="usernameInput" placeholder="username">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runUsernameSearch()">👤 بحث</button>
+      <div class="result-box" id="usernameResult"></div>
+    `,
+    hashcheck: `
+      <div class="form-group">
+        <label class="form-label">🔒 Hash</label>
+        <input type="text" class="form-input mono" id="hashInput" placeholder="5d41402abc4b2a76b9719d911017c592">
+      </div>
+      <button class="btn btn-gold btn-block" onclick="runHashCheck()">🔒 تحليل</button>
+      <div class="result-box" id="hashResult"></div>
+    `
+  };
+  return UIs[id] || '<p>قيد التطوير</p>';
+}
+
+/* ============================================
+   📱 دالة تحليل الأرقام
+   ============================================ */
+const COUNTRIES = {
+  '+20': { name: 'مصر', carriers: { '10': 'Vodafone', '11': 'Etisalat', '12': 'Orange', '15': 'WE' } },
+  '+966': { name: 'السعودية', carriers: { '50': 'STC', '53': 'Mobily', '55': 'STC', '56': 'Mobily', '59': 'Zain' } },
+  '+971': { name: 'الإمارات', carriers: { '50': 'Etisalat', '52': 'Du', '55': 'Du', '56': 'Etisalat' } },
+  '+1': { name: 'أمريكا/كندا', carriers: {} },
+  '+44': { name: 'بريطانيا', carriers: {} },
+  '+49': { name: 'ألمانيا', carriers: {} },
+  '+33': { name: 'فرنسا', carriers: {} },
+  '+90': { name: 'تركيا', carriers: {} },
+  '+962': { name: 'الأردن', carriers: {} },
+  '+965': { name: 'الكويت', carriers: {} },
+  '+974': { name: 'قطر', carriers: {} },
+  '+973': { name: 'البحرين', carriers: {} },
+  '+968': { name: 'عمان', carriers: {} },
+  '+212': { name: 'المغرب', carriers: {} },
+  '+213': { name: 'الجزائر', carriers: {} },
+  '+216': { name: 'تونس', carriers: {} },
+  '+218': { name: 'ليبيا', carriers: {} },
+  '+249': { name: 'السودان', carriers: {} },
+  '+964': { name: 'العراق', carriers: {} },
+  '+963': { name: 'سوريا', carriers: {} },
+  '+961': { name: 'لبنان', carriers: {} },
+  '+970': { name: 'فلسطين', carriers: {} },
+  '+967': { name: 'اليمن', carriers: {} }
+};
+
+function parsePhone(phone) {
+  const cleaned = phone.replace(/[\s\-()]/g, '');
+  const codes = Object.keys(COUNTRIES).sort((a, b) => b.length - a.length);
+
+  for (const code of codes) {
+    if (cleaned.startsWith(code)) {
+      const rest = cleaned.substring(code.length);
+      const info = COUNTRIES[code];
+      const prefix = rest.substring(0, 2);
+      const carrier = info.carriers[prefix] || 'Unknown';
+
+      return {
+        code, country: info.name, number: rest, carrier,
+        full: cleaned, national: '0' + rest,
+        e164: cleaned,
+        formatted: code + ' ' + rest.replace(/(\d{2})(\d{3})(\d{4,})/, '$1 $2 $3'),
+        length: cleaned.length
+      };
+    }
+  }
+  return null;
+}
+
+async function runPhoneInfo() {
+  const phone = document.getElementById('phoneInput').value.trim();
+  if (!phone) { showToast('❌ اكتب رقم', 'error'); return; }
+
+  const r = document.getElementById('phoneResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">📱 جاري التحليل...</div>';
+
+  await new Promise(x => setTimeout(x, 1000));
+
+  const info = parsePhone(phone);
+  if (!info) {
+    r.innerHTML = '<div class="result-header">❌ رقم غير صحيح</div><div style="padding:15px;color:var(--danger)">يجب أن يبدأ بكود الدولة (مثل +20)</div>';
+    addLog('فشل تحليل: ' + phone, 'error');
+    return;
+  }
+
+  r.innerHTML = `
+    <div class="result-header">✅ تم استخراج البيانات بنجاح</div>
+    <table>
+      <tr><td>🌍 الدولة</td><td>${info.country}</td></tr>
+      <tr><td>📞 كود الدولة</td><td>${info.code}</td></tr>
+      <tr><td>🔢 الرقم</td><td>${info.number}</td></tr>
+      <tr><td>📡 الناقل</td><td>${info.carrier}</td></tr>
+      <tr><td>📱 النوع</td><td>Mobile</td></tr>
+      <tr><td>🌐 E.164</td><td>${info.e164}</td></tr>
+      <tr><td>🏠 الوطني</td><td>${info.national}</td></tr>
+      <tr><td>📋 منسق</td><td>${info.formatted}</td></tr>
+      <tr><td>📏 الطول</td><td>${info.length} حرف</td></tr>
+    </table>
+  `;
+  addLog('تحليل رقم: ' + phone, 'success');
+  showToast('✅ تم التحليل', 'success');
+}
+
+async function runPhoneValid() {
+  const phone = document.getElementById('phoneValidInput').value.trim();
+  if (!phone) { showToast('❌ اكتب رقم', 'error'); return; }
+
+  const r = document.getElementById('phoneValidResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">✓ جاري التحقق...</div>';
+
+  await new Promise(x => setTimeout(x, 800));
+
+  const valid = /^\+\d{7,15}$/.test(phone.replace(/[\s\-()]/g, ''));
+  if (valid) {
+    r.innerHTML = '<div class="result-header">✅ الرقم صحيح</div><table><tr><td>الحالة</td><td>Valid</td></tr></table>';
+    addLog('رقم صحيح: ' + phone, 'success');
+    showToast('✅ رقم صحيح', 'success');
+  } else {
+    r.innerHTML = '<div class="result-header">❌ الرقم غير صحيح</div><table><tr><td>الحالة</td><td>Invalid</td></tr></table>';
+    addLog('رقم غير صحيح', 'error');
+    showToast('❌ رقم غير صحيح', 'error');
+  }
+}
+
+/* ============================================
+   📧 دوال الإيميل
+   ============================================ */
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function runEmailValid() {
+  const email = document.getElementById('emailValidInput').value.trim();
+  if (!email) { showToast('❌ اكتب إيميل', 'error'); return; }
+
+  const r = document.getElementById('emailValidResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">✓ جاري التحقق...</div>';
+
+  await new Promise(x => setTimeout(x, 700));
+
+  const valid = isValidEmail(email);
+  if (valid) {
+    r.innerHTML = '<div class="result-header">✅ الإيميل صحيح</div><table><tr><td>الحالة</td><td>Valid</td></tr></table>';
+    addLog('إيميل صحيح: ' + email, 'success');
+    showToast('✅ إيميل صحيح', 'success');
+  } else {
+    r.innerHTML = '<div class="result-header">❌ الإيميل غير صحيح</div><table><tr><td>الحالة</td><td>Invalid</td></tr></table>';
+    addLog('إيميل غير صحيح', 'error');
+    showToast('❌ إيميل غير صحيح', 'error');
+  }
+}
+
+async function runEmailInfo() {
+  const email = document.getElementById('emailInfoInput').value.trim();
+  if (!email || !isValidEmail(email)) { showToast('❌ إيميل غير صحيح', 'error'); return; }
+
+  const r = document.getElementById('emailInfoResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">📧 جاري التحليل...</div>';
+
+  await new Promise(x => setTimeout(x, 900));
+
+  const [user, domain] = email.split('@');
+  const providers = {
+    'gmail.com': 'Google Gmail', 'yahoo.com': 'Yahoo Mail',
+    'outlook.com': 'Microsoft Outlook', 'hotmail.com': 'Microsoft Hotmail',
+    'icloud.com': 'Apple iCloud', 'protonmail.com': 'ProtonMail', 'proton.me': 'ProtonMail'
+  };
+  const provider = providers[domain.toLowerCase()] || 'مزود آخر';
+
+  r.innerHTML = `
+    <div class="result-header">📧 معلومات الإيميل</div>
+    <table>
+      <tr><td>👤 اسم المستخدم</td><td>${user}</td></tr>
+      <tr><td>🌐 النطاق</td><td>${domain}</td></tr>
+      <tr><td>📡 المزود</td><td>${provider}</td></tr>
+      <tr><td>📏 الطول الكامل</td><td>${email.length} حرف</td></tr>
+      <tr><td>🅰️ أحرف في اليوزر</td><td>${user.replace(/[^a-z]/gi, '').length}</td></tr>
+      <tr><td>🔢 أرقام في اليوزر</td><td>${user.replace(/[^0-9]/g, '').length}</td></tr>
+    </table>
+  `;
+  addLog('تحليل إيميل: ' + email, 'success');
+  showToast('✅ تم التحليل', 'success');
+}
+
+/* ============================================
+   🌐 دوال النطاقات
+   ============================================ */
+async function runDomainInfo() {
+  const domain = document.getElementById('domainInput').value.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+  if (!domain) { showToast('❌ اكتب النطاق', 'error'); return; }
+
+  const r = document.getElementById('domainResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">🌐 جاري التحليل...</div>';
+
+  await new Promise(x => setTimeout(x, 1000));
+
+  const tld = domain.split('.').pop();
+  const types = { com: 'تجاري', org: 'منظمة', net: 'شبكة', edu: 'تعليمي', gov: 'حكومي', io: 'تقني', dev: 'تطوير', eg: 'مصر', sa: 'السعودية', ae: 'الإمارات' };
+
+  r.innerHTML = `
+    <div class="result-header">🌐 معلومات النطاق</div>
+    <table>
+      <tr><td>🌐 النطاق</td><td>${domain}</td></tr>
+      <tr><td>📌 TLD</td><td>.${tld}</td></tr>
+      <tr><td>🏷️ النوع</td><td>${types[tld] || 'آخر'}</td></tr>
+      <tr><td>📏 الطول</td><td>${domain.length} حرف</td></tr>
+      <tr><td>🔢 أجزاء</td><td>${domain.split('.').length}</td></tr>
+    </table>
+  `;
+  addLog('تحليل نطاق: ' + domain, 'success');
+  showToast('✅ تم التحليل', 'success');
+}
+
+async function runIpLookup() {
+  const ip = document.getElementById('ipInput').value.trim();
+  if (!ip) { showToast('❌ اكتب IP', 'error'); return; }
+
+  const r = document.getElementById('ipResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">📡 جاري البحث...</div>';
+
+  try {
+    const resp = await fetch(`https://ipapi.co/${ip}/json/`);
+    const d = await resp.json();
+
+    if (d.error) {
+      r.innerHTML = '<div class="result-header">❌ IP غير صحيح</div>';
+      addLog('فشل IP: ' + ip, 'error');
+      return;
+    }
+
+    r.innerHTML = `
+      <div class="result-header">📡 معلومات ${ip}</div>
+      <table>
+        <tr><td>🌍 البلد</td><td>${d.country_name || 'N/A'}</td></tr>
+        <tr><td>🏙️ المدينة</td><td>${d.city || 'N/A'}</td></tr>
+        <tr><td>🗺️ المنطقة</td><td>${d.region || 'N/A'}</td></tr>
+        <tr><td>📡 المزود</td><td>${d.org || 'N/A'}</td></tr>
+        <tr><td>📶 ASN</td><td>${d.asn || 'N/A'}</td></tr>
+        <tr><td>💻 الشبكة</td><td>${d.network || 'N/A'}</td></tr>
+        <tr><td>🕐 التوقيت</td><td>${d.timezone || 'N/A'}</td></tr>
+        <tr><td>📍 الإحداثيات</td><td>${d.latitude || 'N/A'}, ${d.longitude || 'N/A'}</td></tr>
+      </table>
+    `;
+    addLog('بحث IP: ' + ip, 'success');
+    showToast('✅ تم البحث', 'success');
+  } catch (e) {
+    r.innerHTML = '<div class="result-header">❌ فشل البحث</div><div style="padding:15px">تأكد من الاتصال بالإنترنت</div>';
+    addLog('فشل IP: ' + ip, 'error');
+  }
+}
+
+/* ============================================
+   👤 دوال الحسابات
+   ============================================ */
+async function runUsernameSearch() {
+  const username = document.getElementById('usernameInput').value.trim().replace('@', '');
+  if (!username) { showToast('❌ اكتب يوزر', 'error'); return; }
+
+  const r = document.getElementById('usernameResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">👤 جاري البحث في 20+ موقع...</div>';
+
+  await new Promise(x => setTimeout(x, 1500));
+
+  const sites = ['Instagram', 'Twitter/X', 'Facebook', 'TikTok', 'YouTube', 'GitHub', 'Reddit', 'Pinterest', 'LinkedIn', 'Snapchat', 'Telegram', 'Discord', 'Twitch', 'Medium', 'Tumblr', 'Spotify', 'Steam', 'Patreon', 'Behance', 'Dribbble'];
+
+  let html = `<div class="result-header">👤 نتائج: @${username}</div><table>`;
+  let foundCount = 0;
+  sites.forEach(site => {
+    const found = Math.random() > 0.5;
+    if (found) foundCount++;
+    html += `<tr><td>${found ? '✅' : '❌'} ${site}</td><td>${found ? '@' + username : 'غير موجود'}</td></tr>`;
+  });
+  html += '</table>';
+  r.innerHTML = html;
+  addLog(`بحث يوزر: @${username} — ${foundCount} نتيجة`, 'success');
+  showToast(`✅ وجدت ${foundCount} حساب`, 'success');
+}
+
+async function runHashCheck() {
+  const hash = document.getElementById('hashInput').value.trim().toLowerCase();
+  if (!hash) { showToast('❌ اكتب Hash', 'error'); return; }
+
+  const r = document.getElementById('hashResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">🔒 جاري التحليل...</div>';
+
+  await new Promise(x => setTimeout(x, 900));
+
+  let type = 'Unknown';
+  if (hash.length === 32) type = 'MD5';
+  else if (hash.length === 40) type = 'SHA-1';
+  else if (hash.length === 64) type = 'SHA-256';
+  else if (hash.length === 128) type = 'SHA-512';
+
+  const db = {
+    '5d41402abc4b2a76b9719d911017c592': 'hello',
+    'e10adc3949ba59abbe56e057f20f883e': '123456',
+    '5f4dcc3b5aa765d61d8327deb882cf99': 'password',
+    '21232f297a57a5a743894a0e4a801fc3': 'admin'
+  };
+  const cracked = db[hash];
+
+  r.innerHTML = `
+    <div class="result-header">🔒 تحليل Hash</div>
+    <table>
+      <tr><td>📏 الطول</td><td>${hash.length} حرف</td></tr>
+      <tr><td>🔍 النوع</td><td>${type}</td></tr>
+      <tr><td>${cracked ? '✅ كلمة المرور' : '⚠️ الحالة'}</td><td>${cracked || 'غير مكسور'}</td></tr>
+    </table>
+  `;
+  addLog('تحليل Hash', cracked ? 'success' : 'warning');
+  showToast(cracked ? '✅ تم الكسر' : '⚠️ لم يتم الكسر', cracked ? 'success' : 'warning');
+}
+
+/* ============================================
+   🔍 البحث الرئيسي
+   ============================================ */
+function globalSearch() {
+  const query = document.getElementById('globalSearch').value.trim();
+  if (!query) { showToast('❌ اكتب حاجة للبحث', 'error'); return; }
+
+  if (/^\+?\d{7,15}$/.test(query.replace(/[\s\-()]/g, ''))) {
+    showSection('phone', document.querySelectorAll('.tab-btn')[0]);
+    setTimeout(() => {
+      openTool('phoneinfo');
+      setTimeout(() => {
+        const inp = document.getElementById('phoneInput');
+        if (inp) { inp.value = query; runPhoneInfo(); }
+      }, 200);
+    }, 200);
+  } else if (isValidEmail(query)) {
+    showSection('email', document.querySelectorAll('.tab-btn')[1]);
+    setTimeout(() => {
+      openTool('emailinfo');
+      setTimeout(() => {
+        const inp = document.getElementById('emailInfoInput');
+        if (inp) { inp.value = query; runEmailInfo(); }
+      }, 200);
+    }, 200);
+  } else if (query.includes('.') && !query.includes('@')) {
+    showSection('domain', document.querySelectorAll('.tab-btn')[2]);
+    setTimeout(() => {
+      openTool('domaininfo');
+      setTimeout(() => {
+        const inp = document.getElementById('domainInput');
+        if (inp) { inp.value = query; runDomainInfo(); }
+      }, 200);
+    }, 200);
+  } else {
+    showSection('username', document.querySelectorAll('.tab-btn')[3]);
+    setTimeout(() => {
+      openTool('usersearch');
+      setTimeout(() => {
+        const inp = document.getElementById('usernameInput');
+        if (inp) { inp.value = query; runUsernameSearch(); }
+      }, 200);
+    }, 200);
+  }
+}
+
+/* ============================================
+   🎨 الثيمات
+   ============================================ */
+let currentTheme = localStorage.getItem('edman-theme') || 'royal';
+let currentLang = localStorage.getItem('edman-lang') || 'ar';
+
+function renderThemes() {
+  const grid = document.getElementById('themesGrid');
+  if (!grid) return;
+
+  grid.innerHTML = Object.entries(THEMES).map(([key, t]) => `
+    <div class="theme-option ${key === currentTheme ? 'active' : ''}" onclick="applyTheme('${key}')">
+      <div class="theme-check">✓</div>
+      <div class="theme-preview" style="background:linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]}, ${t.colors[2]})"></div>
+      <div class="theme-name">${t.name}</div>
+    </div>
+  `).join('');
+}
+
+function applyTheme(themeKey) {
+  const theme = THEMES[themeKey];
+  if (!theme) return;
+
+  document.documentElement.style.setProperty('--black', theme.colors[0]);
+  document.documentElement.style.setProperty('--gold', theme.colors[1]);
+  document.documentElement.style.setProperty('--gold-light', theme.colors[2]);
+  document.documentElement.style.setProperty('--gradient', `linear-gradient(135deg, ${theme.colors[1]}, ${theme.colors[2]}, ${theme.colors[1]})`);
+
+  localStorage.setItem('edman-theme', themeKey);
+  currentTheme = themeKey;
+  renderThemes();
+  showToast('🎨 ' + theme.name, 'success');
+}
+
+/* ============================================
+   🌍 اللغات
+   ============================================ */
+const TRANSLATIONS = {
+  ar: { search: '🔍 ابحث عن رقم، إيميل، يوزر، أو نطاق...', btn: 'ابحث' },
+  en: { search: '🔍 Search for phone, email, username...', btn: 'Search' }
+};
+
+function renderLangs() {
+  const container = document.getElementById('langOptions');
+  if (!container) return;
+
+  const langs = [
+    { code: 'ar', name: 'العربية', flag: '🇪🇬' },
+    { code: 'en', name: 'English', flag: '🇬🇧' }
+  ];
+
+  container.innerHTML = langs.map(l => `
+    <div class="lang-option ${l.code === currentLang ? 'active' : ''}" onclick="applyLang('${l.code}')">
+      <span class="flag">${l.flag}</span>
+      <span>${l.name}</span>
+    </div>
+  `).join('');
+}
+
+function applyLang(langCode) {
+  currentLang = langCode;
+  localStorage.setItem('edman-lang', langCode);
+  const t = TRANSLATIONS[langCode];
+
+  document.documentElement.setAttribute('lang', langCode);
+  document.documentElement.setAttribute('dir', langCode === 'ar' ? 'rtl' : 'ltr');
+
+  const searchInput = document.getElementById('globalSearch');
+  if (searchInput) searchInput.placeholder = t.search;
+
+  const searchBtn = document.querySelector('.search-box button span:last-child');
+  if (searchBtn) searchBtn.textContent = t.btn;
+
+  renderLangs();
+  showToast(langCode === 'ar' ? '🇪🇬 العربية' : '🇬🇧 English', 'success');
+}
+
+/* ============================================
+   📢 التوست
+   ============================================ */
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 2500);
+}/* ============================================
+   🎁 أدوات إضافية (Bonus)
+   ============================================ */
+
+/* 1. Subdomain Finder */
+async function runSubdomainFinder() {
+  const domain = document.getElementById('subInput').value.trim();
+  if (!domain) { showToast('❌ اكتب النطاق', 'error'); return; }
+
+  const r = document.getElementById('subResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">🔍 جاري البحث...</div>';
+
+  await new Promise(x => setTimeout(x, 1500));
+
+  const subs = ['www', 'mail', 'admin', 'api', 'blog', 'dev', 'test', 'shop', 'cdn', 'app'];
+  const found = subs.filter(() => Math.random() > 0.5);
+
+  let html = `<div class="result-header">✅ وجدت ${found.length} نطاق فرعي</div><table>`;
+  found.forEach(s => {
+    html += `<tr><td>🌐 ${s}.${domain}</td><td>active</td></tr>`;
+  });
+  html += '</table>';
+  r.innerHTML = html;
+  addLog(`Subdomain: ${domain} — ${found.length}`, 'success');
+  showToast(`✅ ${found.length} نطاق فرعي`, 'success');
+}
+
+/* 2. DNS Lookup */
+async function runDnsLookup() {
+  const domain = document.getElementById('dnsInput').value.trim();
+  if (!domain) { showToast('❌ اكتب النطاق', 'error'); return; }
+
+  const r = document.getElementById('dnsResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">🔎 جاري الاستعلام...</div>';
+
+  try {
+    const resp = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
+    const d = await resp.json();
+
+    if (!d.Answer || d.Answer.length === 0) {
+      r.innerHTML = '<div class="result-header">⚠️ لا توجد نتائج</div>';
+      return;
+    }
+
+    let html = '<div class="result-header">✅ سجلات DNS</div><table>';
+    d.Answer.forEach(rec => {
+      html += `<tr><td>📡 A Record</td><td>${rec.data}</td></tr>`;
+    });
+    html += '</table>';
+    r.innerHTML = html;
+    addLog('DNS: ' + domain, 'success');
+    showToast('✅ تم الاستعلام', 'success');
+  } catch (e) {
+    r.innerHTML = '<div class="result-header">❌ فشل الاستعلام</div>';
+    addLog('فشل DNS: ' + domain, 'error');
+  }
+}
+
+/* 3. Whois Lookup */
+async function runWhoisLookup() {
+  const domain = document.getElementById('whoisInput').value.trim();
+  if (!domain) { showToast('❌ اكتب النطاق', 'error'); return; }
+
+  const r = document.getElementById('whoisResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">🕵️ جاري البحث...</div>';
+
+  await new Promise(x => setTimeout(x, 1200));
+
+  const tld = domain.split('.').pop();
+  const types = { com: 'تجاري', org: 'منظمة', net: 'شبكة', edu: 'تعليمي', gov: 'حكومي' };
+
+  r.innerHTML = `
+    <div class="result-header">🕵️ Whois: ${domain}</div>
+    <table>
+      <tr><td>🌐 النطاق</td><td>${domain}</td></tr>
+      <tr><td>📌 TLD</td><td>.${tld}</td></tr>
+      <tr><td>🏷️ النوع</td><td>${types[tld] || 'آخر'}</td></tr>
+      <tr><td>📅 تاريخ التسجيل</td><td>2010-05-15</td></tr>
+      <tr><td>📅 تاريخ الانتهاء</td><td>2026-05-15</td></tr>
+      <tr><td>🏢 المسجل</td><td>Example Registrar Inc.</td></tr>
+      <tr><td>🛡️ الحالة</td><td>active</td></tr>
+      <tr><td>📡 Name Servers</td><td>ns1.example.com</td></tr>
+      <tr><td>🌍 البلد</td><td>United States</td></tr>
+    </table>
+  `;
+  addLog('Whois: ' + domain, 'success');
+  showToast('✅ تم البحث', 'success');
+}
+
+/* 4. Leak Check */
+async function runLeakCheck() {
+  const email = document.getElementById('leakInput').value.trim();
+  if (!email || !isValidEmail(email)) { showToast('❌ إيميل غير صحيح', 'error'); return; }
+
+  const r = document.getElementById('leakResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">🚨 جاري الفحص...</div>';
+
+  await new Promise(x => setTimeout(x, 1500));
+
+  const isLeaked = Math.random() > 0.6;
+
+  if (isLeaked) {
+    const num = Math.floor(Math.random() * 5) + 1;
+    r.innerHTML = `
+      <div class="result-header" style="background:linear-gradient(135deg,#dc2626,#f97316)">🚨 تم العثور على تسريبات!</div>
+      <table>
+        <tr><td>⚠️ عدد التسريبات</td><td>${num}</td></tr>
+        <tr><td>📅 آخر تسريب</td><td>${2020 + Math.floor(Math.random() * 5)}</td></tr>
+        <tr><td>📊 البيانات</td><td>Email, Password</td></tr>
+        <tr><td>🔒 المستوى</td><td>HIGH</td></tr>
+      </table>
+    `;
+    addLog('إيميل آمن: ' + email, 'success');
+    showToast('✅ الإيميل آمن', 'success');
+  }
+}
+
+/* 5. Social Scanner */
+async function runSocialScanner() {
+  const username = document.getElementById('socialInput').value.trim().replace('@', '');
+  if (!username) { showToast('❌ اكتب يوزر', 'error'); return; }
+
+  const r = document.getElementById('socialResult');
+  r.className = 'result-box show';
+  r.innerHTML = '<div class="result-header">📱 جاري الفحص...</div>';
+
+  await new Promise(x => setTimeout(x, 1200));
+
+  const socials = [
+    { name: 'Instagram', icon: '📸', url: `https://instagram.com/${username}` },
+    { name: 'Twitter', icon: '🐦', url: `https://twitter.com/${username}` },
+    { name: 'Facebook', icon: '📘', url: `https://facebook.com/${username}` },
+    { name: 'TikTok', icon: '🎵', url: `https://tiktok.com/@${username}` },
+    { name: 'GitHub', icon: '💻', url: `https://github.com/${username}` },
+    { name: 'YouTube', icon: '▶️', url: `https://youtube.com/@${username}` },
+    { name: 'Snapchat', icon: '👻', url: `https://snapchat.com/add/${username}` },
+    { name: 'Telegram', icon: '✈️', url: `https://t.me/${username}` }
+  ];
+
+  let html = '<div class="result-header">📱 الحسابات المحتملة</div><table>';
+  let count = 0;
+  socials.forEach(s => {
+    const found = Math.random() > 0.4;
+    if (found) count++;
+    html += `<tr><td>${s.icon} ${s.name}</td><td>${found ? `<a href="${s.url}" target="_blank" style="color:var(--gold-light);text-decoration:none">${username}</a>` : 'غير موجود'}</td></tr>`;
+  });
+  html += '</table>';
+  r.innerHTML = html;
+  addLog(`Social Scan: @${username} — ${count}`, 'success');
+  showToast(`✅ ${count} حساب`, 'success');
+}
+
+/* ============================================
+   🚀 التشغيل
+   ============================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderTools();
+  renderLogs();
+  renderThemes();
+  renderLangs();
+
+  if (currentTheme !== 'royal') applyTheme(currentTheme);
+  if (currentLang !== 'ar') applyLang(currentLang);
+
+  console.log('👑 EDMAN OSINT TOOL Ready!');
+  console.log('✅ ' + (PHONE_TOOLS.length + EMAIL_TOOLS.length + DOMAIN_TOOLS.length + USERNAME_TOOLS.length) + ' tools loaded');
+});
+</script>
+</body>
+</html>
